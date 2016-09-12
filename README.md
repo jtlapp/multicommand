@@ -89,9 +89,9 @@ In addition to including the values of the options provided on the command line,
 
 ## API Reference
 
-The `multicommand` module makes the following classes available as properties. The module is here assumed to be loaded in the variable `multicmd`.  
+The `multicommand` module makes the following classes available as properties.  
 
-* **multicmd**
+* **multicommand**
 
     * [.**MultiCommand**](#new_MultiCommand_new)
     * [.**NamedCommand**](#new_NamedCommand_new)
