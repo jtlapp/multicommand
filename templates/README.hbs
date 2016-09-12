@@ -16,7 +16,7 @@ MultiCommand is the base class for the executable command line. NamedCommand is 
 
 ## Benefits
 
-MultiCommand is primarily useful for implementating multiple commands that may incrementally build on one another or on common abstract base classes. Command options are configured via `[minimist](https://github.com/substack/minimist)` configuration options, and although each command can independently specify its options, each class in a hierarchy can also incremently add the options it expects and extract the arguments that are specific to the class.
+MultiCommand is primarily useful for implementating multiple commands that may incrementally build on one another or on common abstract base classes. Command options are configured via [`minimist`](https://github.com/substack/minimist) configuration options, and although each command can independently specify its options, each class in a hierarchy can also incremently add the options it expects and extract the arguments that are specific to the class.
 
 MultiCommand also provides default handling for displaying help. It lists summary information for each command on an overall help page, and it allows each command to provide its own specific help page. Subclass MultiCommand to override the default help page behavior.
 
@@ -74,7 +74,7 @@ These are each separate methods so that an inheritance tree may selectively over
 
 ## Minimist Options and Arguments
 
-`multicommand` uses the `[minimist](https://github.com/substack/minimist)` module to define and read command line options. The `minimist` configuration options passed to `parseArgs()` and `parseDefaultArgs()` support the following properties, all of which are optional:
+`multicommand` uses the [`minimist`](https://github.com/substack/minimist) module to define and read command line options. The `minimist` configuration options passed to `parseArgs()` and `parseDefaultArgs()` support the following properties, all of which are optional:
 
 | Property | Description |
 | -- | -- |

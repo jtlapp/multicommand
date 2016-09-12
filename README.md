@@ -16,7 +16,7 @@ MultiCommand is the base class for the executable command line. NamedCommand is 
 
 ## Benefits
 
-MultiCommand is primarily useful for implementating multiple commands that may incrementally build on one another or on common abstract base classes. Command options are configured via `[minimist](https://github.com/substack/minimist)` configuration options, and although each command can independently specify its options, each class in a hierarchy can also incremently add the options it expects and extract the arguments that are specific to the class.
+MultiCommand is primarily useful for implementating multiple commands that may incrementally build on one another or on common abstract base classes. Command options are configured via [`minimist`](https://github.com/substack/minimist) configuration options, and although each command can independently specify its options, each class in a hierarchy can also incremently add the options it expects and extract the arguments that are specific to the class.
 
 MultiCommand also provides default handling for displaying help. It lists summary information for each command on an overall help page, and it allows each command to provide its own specific help page. Subclass MultiCommand to override the default help page behavior.
 
@@ -74,7 +74,7 @@ These are each separate methods so that an inheritance tree may selectively over
 
 ## Minimist Options and Arguments
 
-`multicommand` uses the `[minimist](https://github.com/substack/minimist)` module to define and read command line options. The `minimist` configuration options passed to `parseArgs()` and `parseDefaultArgs()` support the following properties, all of which are optional:
+`multicommand` uses the [`minimist`](https://github.com/substack/minimist) module to define and read command line options. The `minimist` configuration options passed to `parseArgs()` and `parseDefaultArgs()` support the following properties, all of which are optional:
 
 | Property | Description |
 | -- | -- |
@@ -130,23 +130,19 @@ The `multicommand` module makes the following classes available as properties. T
 
 * [NamedCommand](#NamedCommand)
 
-    * _instance_
-        * [.addOptions(options)](#NamedCommand+addOptions)
+    * [.addOptions(options)](#NamedCommand+addOptions)
 
-        * [.parseArgs(args)](#NamedCommand+parseArgs)
+    * [.parseArgs(args)](#NamedCommand+parseArgs)
 
-        * [.doCommand(args, next)](#NamedCommand+doCommand)
+    * [.doCommand(args, next)](#NamedCommand+doCommand)
 
-        * [.getHelp(rightMargin)](#NamedCommand+getHelp)
+    * [.getHelp(rightMargin)](#NamedCommand+getHelp)
 
-        * [.confirm(message, next)](#NamedCommand+confirm)
+    * [.confirm(message, next)](#NamedCommand+confirm)
 
-        * [.error(message, ...substitutions)](#NamedCommand+error)
+    * [.error(message, ...substitutions)](#NamedCommand+error)
 
-        * [.usageError(message, ...substitutions)](#NamedCommand+usageError)
-
-    * _static_
-        * [.getInfo()](#NamedCommand.getInfo)
+    * [.usageError(message, ...substitutions)](#NamedCommand+usageError)
 
 
 
@@ -355,12 +351,6 @@ Shorthand method for creating CommandUsageError exceptions. The method accepts `
 This is a support method for implementations of `parseArgs()`.
 
 **Returns**: A new instance of CommandUsageError.  
-<a name="NamedCommand.getInfo"></a>
-
-### *NamedCommand*.getInfo()
-Returns information about the named command. Only concrete subclasses of NamedCommand need implement this static class method.
-
-**Returns**: An object containing a `syntax` property illustrating the command's syntax, and a `summary` property briefly describing the command in a single line.  
 <a name="new_CommandError_new"></a>
 
 ### new CommandError()
