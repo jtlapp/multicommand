@@ -1,0 +1,40 @@
+{
+  "name": "multicommand",
+  "version": "0.5.0",
+  "description": "class framework for CLI tools implementing multiple commands ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "jsdoc2md --plugin dmd-clear --template templates/README.hbs --src index.js lib/MultiCommand.js lib/NamedCommand.js lib/errors.js > README.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jtlapp/multicommand.git"
+  },
+  "keywords": [
+    "CLI",
+    "command",
+    "minimist",
+    "classes",
+    "help"
+  ],
+  "author": {
+    "name": "Joe Lapp",
+    "email": "arachnojoe@gmail.com",
+    "url": "http://josephtlapp.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jtlapp/multicommand/issues"
+  },
+  "homepage": "https://github.com/jtlapp/multicommand#readme",
+  "dependencies": {
+    "es6-error": "^3.1.0",
+    "minimist": "^1.2.0",
+    "option-help": "^0.5.2",
+    "prompt": "^1.0.0"
+  },
+  "devDependencies": {
+    "dmd-clear": "^0.1.2"
+  }
+}

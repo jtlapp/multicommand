@@ -1,0 +1,139 @@
+# multicommand
+
+class framework for CLI tools implementing multiple commands 
+
+## NOTICE
+
+This module requires embellishment for general use. It is missing illustrative examples and a test suite. It is currently functioning in a private system.
+
+## Overview
+
+`multicommand` is an object-oriented class framework for implementing command lines that perform the command named in the first argument. When the command line lacks a command name, a default command runs instead. `multicommand` also provides facilities for outputting help for all of the commands.
+
+Each named command, along with the default command, may have its own set of arguments. Commands can use class inheritance to share common arguments and implementation.
+
+MultiCommand is the base class for the executable command line. NamedCommand is the base class for each supported command. One normally subclasses MultiCommand to provide an introduction for the help page and also NamedCommand for each named command. The named command subclasses are registered with the MultiCommand to make them available to the command line.
+
+## Benefits
+
+MultiCommand is primarily useful for implementating multiple commands that may incrementally build on one another or on common abstract base classes. Command options are configured via `[minimist](https://github.com/substack/minimist)` configuration options, and although each command can independently specify its options, each class in a hierarchy can also incremently add the options it expects and extract the arguments that are specific to the class.
+
+MultiCommand also provides default handling for displaying help. It lists summary information for each command on an overall help page, and it allows each command to provide its own specific help page. Subclass MultiCommand to override the default help page behavior.
+
+## Usage
+
+You may create a command line executable by instantiating MultiCommand, but it's best to subclass MultiCommand and at least override `getHelpIntro()` to provide an introduction for the help man page. In addition, it's probably best to have the subclass constructor add the supported commands to the instance.
+
+Add commands to an instance of MultiCommand by calling its `addCommands()` method, passing the method an array of concrete subclasses of the abstract class NamedCommand. You may call `addCommands()` multiple times. The default implementation of `MultiCommand#getHelp()` separates each set of added commands by a blank line on the help page to visually group related commands together.
+
+Call `run()` on the MultiCommand to perform the requested command, passing in the raw command line arguments and providing a callback. The callback allows the command to report completion after asynchronous processing.
+
+## The Default Command
+
+When the command line does not start with a command name, an unnamed default command runs. MultiCommand implements this default command by performing the following steps:
+
+1. Passes minimist configuration options to `addDefaultOptions()` to allow the command to extend the configuration to support additional options. The initially provided configuration only supports `-h` and `--help`.
+2. Passes the arguments output by minimist to `parseDefaultArgs()` for parsing and validation.
+3. Calls `doDefaultCommand()` to perform the default command with the parsed and validated arguments.
+
+When the command line includes `-h` or `--help` but no named command, neither `parseDefaultArgs()` nor `doDefaultCommand()` is called, and `getHelp()` is called instead to show general help for all available commands.
+
+## Named Commands
+
+Concrete subclasses of NamedCommand implement named commands. When the first argument of the command line is a non-option argument (i.e. doesn't begin with a dash), this argument is expected to be a command name. The remaining arguments are the arguments of the particular named command. MultiCommand passes these arguments to the instance of NamedCommand that handles the named command, delegating execution of the command line to the instance.
+
+The methods of NamedCommand are designed to allow class inheritance to facilitate sharing code that is common across commands.
+
+### Defining a Named Command
+
+Each concrete subclass of NamedCommand that implements a particular command name implements the static class method `getInfo()` to define the command. This method returns an object having the following two properties:
+
+- `syntax`: A string that illustrates the command's argument syntax. The first term of this string is the command name. The name must neither begin with a dash nor contain spaces. The name may be in any letter case, but a user may provide the name in any letter case to run the command.
+- `summary`: A single line that summarizes the command, for display when providing help for all of the commands.
+
+The following example illustrates `getInfo()`:
+
+```js
+static getInfo() {
+    return {
+        syntax: "dequeue [<job-number>] [--all]",
+        summary: "Removes pending job(s) from the job queue"
+    };
+}
+```
+
+### Named Command Execution
+
+Upon recognizing the command on the command line, MultiCommand creates an instance of the named command subclass and performs the following steps:
+
+1. Passes minimist configuration options to `addOptions()` to allow the command to extend the configuration to support additional options. The initially provided configuration only supports `-h` and `--help`.
+2. Passes the arguments output by minimist to `parseArgs()` for parsing and validation.
+3. Calls `doCommand()` to perform the named command with the parsed and validated arguments.
+
+These are each separate methods so that an inheritance tree may selectively override them. When the command line includes `-h` or `--help`, neither `parseArgs()` nor `doCommand()` is called, and `getHelp()` is called instead.
+
+## Minimist Options and Arguments
+
+`multicommand` uses the `[minimist](https://github.com/substack/minimist)` module to define and read command line options. The `minimist` configuration options passed to `parseArgs()` and `parseDefaultArgs()` support the following properties, all of which are optional:
+
+| Property | Description |
+| -- | -- |
+| `boolean` | An array of strings, each of which names a command line option that serves as a boolean switch. For example, `['x', 'recurse']` define the boolean switchs `-x` and `--recurse`. Single-letter switches are indicated on the command line with a single dash, while multi-letter switches are indicated via double-dashes. The `args` provided to subsequent methods includes a boolean of this name. This boolean is `true` when the command line includes the switch and false otherwise. If the command line includes `-xN` or `--recurse=N`, where `N` is a number, then the value of the switch in `args` is instead this number. |
+| `string` | An array of strings, each of which names a command line option that expects a string value to follow. For example, `['file']` indicates that the `file` option must take either of the forms `--file <string>` or `--file=<string>`. The `args` of subsequent methods includes a string of this name having this value. For example, `args.file` would have value `<string>`. |
+| `default` | An object that provides default values for options named in `boolean` and `string`. The keys of this object are the names of options in `boolean` and `string`. The value at a key is the default value of the option. It is not necessary to provide default values for the named `boolean` and `string` options, as booleans are `false` by default and strings are empty by default. |
+| `alias` | An object that defines aliases for options named in `boolean` and `string`. The keys of this object are new names for options otherwise defined, and the value of each key names the already-defined option to which the alias is equivalent. The alias and the option it aliases will both have the same value in the `args` passed to subsequent methods. |
+
+When the command line includes an option multiple times, the values of options are collected into an array ordered as they occur on the command line, and the option assumes the value of this array in the `args` parameter that gets passed to subsequent methods.
+
+In addition to including the values of the options provided on the command line, as defined by the minimist configuration options, the `args` parameter passed to `parseArgs()` also has a `_` property (that's an underscore). This is an array of all of non-option parameters that occur on the command line following the command name. The array may be empty. `parseArgs()` may access this array directly or pull arguments out of the array sequentially via `args.getNext()`, which returns null when there are no more arguments. `parseArgs()` must empty the `args._` array before returning, as otherwise MultiCommand will error out reporting that the command did not recognize all of the arguments. `args._` is not available to `doCommand()`, so `parseArgs()` must extract any needed non-option argument values.
+
+## API Reference
+
+The `multicommand` module makes the following classes available as properties. The module is here assumed to be loaded in the variable `multicmd`.  
+
+* **multicmd**
+
+    * [.**MultiCommand**](#MultiCommand)
+
+    * [.**NamedCommand**](#NamedCommand)
+
+    * [.**CommandError**](#CommandError)
+
+    * [.**CommandUsageError**](#CommandUsageError)
+
+    * [.**UnexpectedArgError**](#UnexpectedArgError)
+
+{{#class name="MultiCommand"}}
+{{>member-index~}}
+{{/class}}
+{{#class name="NamedCommand"}}
+{{>member-index~}}
+{{/class}}
+
+{{#class name="MultiCommand"}}
+{{>members~}}
+{{/class}}
+{{#class name="NamedCommand"}}
+{{>members~}}
+{{/class}}
+{{#class name="CommandError"}}
+{{>members~}}
+{{/class}}
+{{#class name="CommandUsageError"}}
+{{>members~}}
+{{/class}}
+{{#class name="UnexpectedArgError"}}
+{{>members~}}
+{{/class}}
+
+## LICENSE
+
+This software is released under the MIT license:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Copyright © 2016 Joseph T. Lapp
