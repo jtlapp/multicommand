@@ -20,6 +20,12 @@ MultiCommand is primarily useful for implementating multiple commands that may i
 
 MultiCommand also provides default handling for displaying help. It lists summary information for each command on an overall help page, and it allows each command to provide its own specific help page. Subclass MultiCommand to override the default help page behavior.
 
+## Installation
+
+```
+npm install multicommand --save
+```
+
 ## Usage
 
 You may create a command line executable by instantiating MultiCommand, but it's best to subclass MultiCommand and at least override `getHelpIntro()` to provide an introduction for the help man page. In addition, it's probably best to have the subclass constructor add the supported commands to the instance.
