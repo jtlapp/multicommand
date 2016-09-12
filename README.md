@@ -94,13 +94,9 @@ The `multicommand` module makes the following classes available as properties. T
 * **multicmd**
 
     * [.**MultiCommand**](#MultiCommand)
-
     * [.**NamedCommand**](#NamedCommand)
-
     * [.**CommandError**](#CommandError)
-
     * [.**CommandUsageError**](#CommandUsageError)
-
     * [.**UnexpectedArgError**](#UnexpectedArgError)
 
 
@@ -130,6 +126,8 @@ The `multicommand` module makes the following classes available as properties. T
 
 * [NamedCommand](#NamedCommand)
 
+    * [new NamedCommand()](#new_NamedCommand_new)
+
     * [.addOptions(options)](#NamedCommand+addOptions)
 
     * [.parseArgs(args)](#NamedCommand+parseArgs)
@@ -154,7 +152,7 @@ The `multicommand` module makes the following classes available as properties. T
 | --- | --- |
 | options | The configuration options |
 
-Construct an instance of MultiCommand. Accepts the following configuration options:
+MultiCommand is the base class for tools that implement CLIs supporting multiple commands. The `options` configuration parameter accepts the following properties:
 
 - `helpWrapWidth`: Width in characters at which to wrap help output. Defaults to 80.
 
@@ -177,7 +175,7 @@ Adds named commands, which are subclasses of NamedCommand. May be called multipl
 | argv | An array of command line arguments to process. This array must exclude the arguments for executing the command. For example, if "node filename" executes the command, the caller can provide process.argv.slice(2). |
 | next | The next `function (err)` to call. The caller should handle the error if it is an instance of CommandError. |
 
-Run the command line, including processing command line arguments. One of the methods `MultiCommand#doDefaultCommand` and `NamedCommand#doCommand` is responsible for performing the command after arguments have been processed. See NamedCommand for an explanation of how named commands are processed.
+Run the command line, including processing command line arguments. One of the methods MultiCommand::doDefaultCommand() and NamedCommand::doCommand() is responsible for performing the command after arguments have been processed. See NamedCommand for an explanation of how named commands are processed.
 
 <a name="MultiCommand+addDefaultOptions"></a>
 
@@ -187,7 +185,7 @@ Run the command line, including processing command line arguments. One of the me
 | --- | --- |
 | options | A configuration object of options for minimist. Call `options.add(moreOptions)` to define more options. |
 
-Adds command line options to the two already supported, `-h` and `--help`, for the case where the command line does not include a command name. Command line options are arguments that begin with one or two dashes. The method receives a minimist configuration options object and optionally extends this object. See `NamedCommand#addOptions` for a fuller explanation of the purpose and behavior of this method.
+Adds command line options to the two already supported, `-h` and `--help`, for the case where the command line does not include a command name. Command line options are arguments that begin with one or two dashes. The method receives a minimist configuration options object and optionally extends this object. See NamedCommand::addOptions() for a fuller explanation of the purpose and behavior of this method.
 
 `addDefaultOptions()` does nothing by default. A subclass overrides this method to provide support for option arguments (arguments beginning with one or two dashes).
 
@@ -261,6 +259,17 @@ Returns the summary help for a particular hand as it should appear within the ge
 Returns text that should follow the summaries of all of the commands on the general help page. Returns only a blank line by default.
 
 **Returns**: String of text that ends the general help.  
+<a name="new_NamedCommand_new"></a>
+
+### new NamedCommand()
+NamedCommand is an abstract class representing a named command. After constructing an instance of a concrete subclass of NamedCommand, MultiCommand initializes the instance with the following properties:
+
+Property | Description
+--- | ---
+multicommand | The calling MultiCommand instance
+name | The name of this command, as appears in the first term of the syntax
+info | The information object that `getInfo()` returns
+
 <a name="NamedCommand+addOptions"></a>
 
 ### *namedCommand*.addOptions(options)
@@ -353,17 +362,32 @@ This is a support method for implementations of `parseArgs()`.
 **Returns**: A new instance of CommandUsageError.  
 <a name="new_CommandError_new"></a>
 
-### new CommandError()
+### new CommandError(message)
+
+| Param | Description |
+| --- | --- |
+| message | Description of the error. |
+
 Error that prevents the command from running.
 
 <a name="new_CommandUsageError_new"></a>
 
-### new CommandUsageError()
+### new CommandUsageError(message)
+
+| Param | Description |
+| --- | --- |
+| message | Description of the usage error. |
+
 Command line usage error
 
 <a name="new_UnexpectedArgError_new"></a>
 
-### new UnexpectedArgError()
+### new UnexpectedArgError(arg)
+
+| Param | Description |
+| --- | --- |
+| arg | The unexpected argument |
+
 Error for providing more non-option arguments than the command accepts.
 
 
