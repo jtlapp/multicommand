@@ -1,6 +1,6 @@
 {
   "name": "multicommand",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "class framework for CLI tools implementing multiple commands ",
   "main": "index.js",
   "scripts": {
